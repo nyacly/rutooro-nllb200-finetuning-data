@@ -1,12 +1,18 @@
 """Extract grammar instruction data from an OCR'd document.
 
-The previous version of this script only looked for *noun class* rules
-and relied on brittle regular expressions which frequently missed data.
-Here the parsing logic has been rewritten so that any grammar heading
-(``Noun Class 1``, ``Past Tense``, etc.) followed by an explanation and a
-block of examples is captured.  The patterns are deliberately tolerant of
-extra whitespace, line breaks and punctuation introduced by the OCR
-process.
+The previous iteration used a single large regular expression which often
+captured unrelated paragraphs or swallowed entire sections.  This version
+performs **multi‑stage parsing**:
+
+1. Locate a heading describing the rule.
+2. Collect the explanatory text that follows the heading.
+3. Read a tightly delimited block of examples where each line follows the
+   ``word (translation)`` or ``word - translation`` pattern.  Parsing stops
+   as soon as a non‑matching line or a new heading is encountered, keeping
+   the ``completion`` field concise.
+
+Simple keyword heuristics provide a ``category`` for each rule (e.g.
+``Nouns`` or ``Verbs``).
 """
 
 import json
@@ -18,7 +24,7 @@ from docx import Document
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-# Location of the grammar document containing the noun class rules
+# Location of the grammar document containing the grammar rules
 DOC_PATH = Path("data") / "raw" / "grammar" / "RUNYAKITARA LANGUAGE STUDIES.docx"
 
 # Output directory for the generated JSONL file
@@ -26,18 +32,13 @@ OUTPUT_DIR = Path("data") / "processed"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_FILE = OUTPUT_DIR / "instruction_data.jsonl"
 
-
 def extract_instruction_data(doc_path: Path):
-    """Extract grammar rules and examples from a DOCX file.
+    """Extract grammar rules and examples from *doc_path*.
 
-    The regex captures three groups:
-        1. The rule heading (e.g. ``Noun Class 1``)
-        2. The English explanation paragraph(s)
-        3. The block of examples which may span multiple lines
-
-    Each example is further parsed to separate the Runyoro/Rutooro word
-    from its English translation.  Parentheses, dashes and inconsistent
-    spacing are all tolerated.
+    Parsing is performed line by line to keep the ``instruction`` and
+    ``completion`` fields tightly scoped.  Only the first block of
+    ``Examples`` following a heading is captured, and each example must
+    match ``word (translation)`` to be accepted.
     """
 
     if not doc_path.exists():
@@ -45,51 +46,62 @@ def extract_instruction_data(doc_path: Path):
         return []
 
     document = Document(doc_path)
+    paragraphs = [p.text.strip() for p in document.paragraphs]
+
     structured_data = []
+    i = 0
 
-    # Join all paragraphs with newlines so that rules spanning multiple
-    # lines can be matched using a single regex on the entire document
-    # text.  ``re.MULTILINE`` allows us to anchor headings at the start of
-    # a line.
-    full_text = "\n".join(paragraph.text for paragraph in document.paragraphs)
+    heading_re = re.compile(r"^[A-Z][A-Za-z0-9\s'-]{2,}$")
+    example_re = re.compile(r"^([A-Za-z'’]+)\s*(?:-\s*|\()([^()]+)\)?$")
 
-    # A flexible pattern which looks for:
-    #   1. A heading (start of line, begins with a capital letter)
-    #   2. One or more lines of explanation text
-    #   3. A line starting with "Examples" (":" or "-")
-    #   4. A block of example lines until the next heading or end of file
-    rule_pattern = re.compile(
-        r"(?m)^(?P<heading>[A-Z][^\n]+)\n+"  # heading
-        r"(?P<explanation>[\s\S]*?)"          # explanation paragraph(s)
-        r"\bExamples?\s*[:\-]\s*"            # Examples marker
-        r"(?P<examples>[\s\S]*?)"             # example lines
-        r"(?=\n[A-Z][^\n]+\n|\Z)",          # up to next heading/EOF
-        re.IGNORECASE,
-    )
+    while i < len(paragraphs):
+        line = paragraphs[i]
+        if not line:
+            i += 1
+            continue
+        if not heading_re.match(line):
+            i += 1
+            continue
 
-    for match in rule_pattern.finditer(full_text):
-        heading = re.sub(r"\s+", " ", match.group("heading")).strip()
-        explanation = re.sub(r"\s+", " ", match.group("explanation")).strip()
-        examples_text = match.group("examples").strip()
+        heading = line
+        i += 1
 
-        # Examples may be separated by commas, semicolons or newlines and
-        # can contain either parentheses or dashes before the translation.
-        examples = []
-        for raw_example in re.split(r"[\n;,]+", examples_text):
-            raw_example = raw_example.strip()
-            if not raw_example:
+        # Collect explanatory text until a new heading or Examples marker.
+        explanation_lines = []
+        while i < len(paragraphs):
+            next_line = paragraphs[i]
+            if not next_line:
+                i += 1
                 continue
-            ex_match = re.match(
-                r"([A-Za-z'’]+)\s*(?:[:\-–]\s*)?\(?([^\)\n]+)\)?",
-                raw_example,
-            )
-            if ex_match:
-                runyoro, english = ex_match.groups()
+            if heading_re.match(next_line) or next_line.lower().startswith("examples"):
+                break
+            explanation_lines.append(next_line)
+            i += 1
+        explanation = " ".join(explanation_lines).strip()
+
+        # Collect examples directly following the "Examples" line.
+        examples = []
+        if i < len(paragraphs) and paragraphs[i].lower().startswith("examples"):
+            i += 1
+            while i < len(paragraphs):
+                ex_line = paragraphs[i].strip()
+                if not ex_line:
+                    i += 1
+                    continue
+                if heading_re.match(ex_line) or ex_line.lower().startswith("examples"):
+                    break
+                match = example_re.match(ex_line)
+                if not match:
+                    break
+                runyoro, english = match.groups()
                 examples.append(f"{runyoro} ({english.strip()})")
+                i += 1
 
-        completion = f"{explanation} Examples are: {', '.join(examples)}"
+        if not explanation or not examples:
+            continue
 
-        category = "Noun Classes" if "noun class" in heading.lower() else "Grammar"
+        completion = f"{explanation} Examples: {', '.join(examples)}"
+        category = _categorize_heading(heading)
 
         structured_data.append(
             {
@@ -101,6 +113,21 @@ def extract_instruction_data(doc_path: Path):
         )
 
     return structured_data
+
+
+def _categorize_heading(heading: str) -> str:
+    """Assign a broad grammar category based on keywords in *heading*."""
+
+    h = heading.lower()
+    if "noun" in h:
+        return "Nouns"
+    if "verb" in h:
+        return "Verbs"
+    if "phon" in h or "sound" in h:
+        return "Phonology"
+    if "morph" in h:
+        return "Morphology"
+    return "Grammar"
 
 
 if __name__ == "__main__":
