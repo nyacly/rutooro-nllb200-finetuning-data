@@ -1,9 +1,10 @@
 """Combine the processed JSONL files into a single dataset.
 
 The script collects data produced by the other processing scripts and
-shuffles it into one final JSONL file.  Basic error handling is included
-so that missing or malformed input files do not cause the consolidation
-to abort.
+shuffles it into one final JSONL file.  Robust error handling ensures
+that missing input files or unreadable lines do not cause the process to
+abort; instead warnings are emitted and processing continues with the
+available data.
 """
 
 import json
@@ -28,6 +29,10 @@ EXPECTED_FILES = [
 def consolidate_data(input_dir: Path, output_file: Path = OUTPUT_FILE):
     """Combine and shuffle JSONL files from *input_dir* into *output_file*."""
 
+    if not input_dir.exists():
+        print(f"Warning: input directory {input_dir} does not exist.")
+        return
+
     all_data = []
 
     for filename in EXPECTED_FILES:
@@ -47,9 +52,13 @@ def consolidate_data(input_dir: Path, output_file: Path = OUTPUT_FILE):
 
     random.shuffle(all_data)
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        for item in all_data:
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    try:
+        with open(output_file, "w", encoding="utf-8") as f:
+            for item in all_data:
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    except OSError as err:
+        print(f"Warning: Could not write to {output_file}: {err}")
+        return
 
     print(f"Consolidated and shuffled {len(all_data)} items into {output_file}")
 

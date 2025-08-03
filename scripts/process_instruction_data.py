@@ -1,11 +1,12 @@
 """Extract grammar instruction data from an OCR'd document.
 
-This script searches a grammar document for noun class rules and outputs
-them in a JSONL format suitable for instruction style fine‑tuning.  The
-original OCR text contains many irregularities (extra whitespace, line
-breaks, and punctuation) which previously caused the regular expressions
-to fail.  The patterns below are intentionally tolerant so that such
-noise does not prevent rule extraction.
+The previous version of this script only looked for *noun class* rules
+and relied on brittle regular expressions which frequently missed data.
+Here the parsing logic has been rewritten so that any grammar heading
+(``Noun Class 1``, ``Past Tense``, etc.) followed by an explanation and a
+block of examples is captured.  The patterns are deliberately tolerant of
+extra whitespace, line breaks and punctuation introduced by the OCR
+process.
 """
 
 import json
@@ -47,22 +48,29 @@ def extract_instruction_data(doc_path: Path):
     structured_data = []
 
     # Join all paragraphs with newlines so that rules spanning multiple
-    # lines can be matched using a single regex on the entire text.
+    # lines can be matched using a single regex on the entire document
+    # text.  ``re.MULTILINE`` allows us to anchor headings at the start of
+    # a line.
     full_text = "\n".join(paragraph.text for paragraph in document.paragraphs)
 
-    noun_class_pattern = re.compile(
-        r"(Noun\s*Class\s*\d+.*?)\n+"  # heading line
-        r"([\s\S]*?)"                    # explanation paragraph(s)
-        r"Examples?\s*[:\-]\s*"         # the word 'Examples' with : or -
-        r"([\s\S]*?)"                    # example lines
-        r"(?=\n\s*Noun\s*Class\s*\d+|\Z)",  # until next heading or EOF
+    # A flexible pattern which looks for:
+    #   1. A heading (start of line, begins with a capital letter)
+    #   2. One or more lines of explanation text
+    #   3. A line starting with "Examples" (":" or "-")
+    #   4. A block of example lines until the next heading or end of file
+    rule_pattern = re.compile(
+        r"(?m)^(?P<heading>[A-Z][^\n]+)\n+"  # heading
+        r"(?P<explanation>[\s\S]*?)"          # explanation paragraph(s)
+        r"\bExamples?\s*[:\-]\s*"            # Examples marker
+        r"(?P<examples>[\s\S]*?)"             # example lines
+        r"(?=\n[A-Z][^\n]+\n|\Z)",          # up to next heading/EOF
         re.IGNORECASE,
     )
 
-    for match in noun_class_pattern.finditer(full_text):
-        heading = re.sub(r"\s+", " ", match.group(1)).strip()
-        explanation = re.sub(r"\s+", " ", match.group(2)).strip()
-        examples_text = match.group(3).strip()
+    for match in rule_pattern.finditer(full_text):
+        heading = re.sub(r"\s+", " ", match.group("heading")).strip()
+        explanation = re.sub(r"\s+", " ", match.group("explanation")).strip()
+        examples_text = match.group("examples").strip()
 
         # Examples may be separated by commas, semicolons or newlines and
         # can contain either parentheses or dashes before the translation.
@@ -72,7 +80,7 @@ def extract_instruction_data(doc_path: Path):
             if not raw_example:
                 continue
             ex_match = re.match(
-                r"([A-Za-z'’]+)\s*(?:[-–]\s*)?\(?([^\)\n]+)\)?",
+                r"([A-Za-z'’]+)\s*(?:[:\-–]\s*)?\(?([^\)\n]+)\)?",
                 raw_example,
             )
             if ex_match:
@@ -81,12 +89,14 @@ def extract_instruction_data(doc_path: Path):
 
         completion = f"{explanation} Examples are: {', '.join(examples)}"
 
+        category = "Noun Classes" if "noun class" in heading.lower() else "Grammar"
+
         structured_data.append(
             {
                 "type": "instruction",
-                "instruction": f"Explain the rule for {heading}",
+                "instruction": f"Explain {heading} in Runyoro/Rutooro.",
                 "completion": completion,
-                "category": "Noun Classes",
+                "category": category,
             }
         )
 
