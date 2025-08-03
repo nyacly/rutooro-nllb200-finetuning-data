@@ -50,6 +50,11 @@ def consolidate_data(input_dir: Path, output_file: Path = OUTPUT_FILE):
         except OSError as err:
             print(f"Warning: Could not read {file_path}: {err}")
 
+    # Final sanitisation: remove entries with very short or empty text before
+    # shuffling.  Such entries typically arise from OCR errors or overly
+    # permissive parsing in earlier stages.
+    all_data = [item for item in all_data if _has_min_length(item)]
+
     random.shuffle(all_data)
 
     try:
@@ -61,6 +66,15 @@ def consolidate_data(input_dir: Path, output_file: Path = OUTPUT_FILE):
         return
 
     print(f"Consolidated and shuffled {len(all_data)} items into {output_file}")
+
+
+def _has_min_length(item: dict, min_words: int = 5) -> bool:
+    """Return ``True`` if *item* has a non-empty text/completion field."""
+
+    field = item.get("completion") or item.get("text")
+    if not field:
+        return False
+    return len(field.split()) >= min_words
 
 
 if __name__ == "__main__":

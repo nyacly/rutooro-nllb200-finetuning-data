@@ -1,12 +1,10 @@
 """Extract dictionary style lookup data from an OCR'd document.
 
-Early iterations of this script produced very noisy results because the
-regular expressions were too greedy and happily captured entire
-paragraphs.  The patterns below have been tightened to only accept short
-abbreviation pairs (``adj. - adjective``) and dictionary entries
-(``omwana n. child``).  Variations in spacing and the presence of colons
-or dashes are tolerated, but any line that continues beyond a brief
-definition is ignored.
+This revision focuses on *precision*.  Earlier versions happily captured
+single letters or unrelated fragments.  The regular expressions below
+accept only tightly formatted ``term – definition`` pairs and a small
+filtering function discards obvious noise such as one‑character tokens or
+common stop words.
 """
 
 import json
@@ -42,7 +40,7 @@ def extract_lookup_data(doc_path: Path):
     # Only a short English string (up to ~5 words) is accepted in order to
     # avoid capturing full sentences.
     abbr_pattern = re.compile(
-        r"^([A-Za-z]+\.?)\s*[:\-–]?\s*([A-Za-z][A-Za-z\s'/-]{0,40})$",
+        r"^([A-Za-z]{2,}\.?)\s*[:\-–]\s*([A-Za-z][A-Za-z\s'/-]{1,40})$",
         re.IGNORECASE,
     )
 
@@ -51,9 +49,11 @@ def extract_lookup_data(doc_path: Path):
     # definition is limited to the first clause (terminated by punctuation)
     # and must be reasonably short to reduce noise.
     dict_pattern = re.compile(
-        r"^([A-Za-z'’]+)\s+(?:n\.|v\.|adj\.|adv\.|pron\.|prep\.|conj\.|interj\.)\s*[:\-–]?\s*([^.;,]{1,80})$",
+        r"^([A-Za-z'’]{2,})\s+(?:n\.|v\.|adj\.|adv\.|pron\.|prep\.|conj\.|interj\.)\s*[:\-–]\s*([A-Za-z][^.;,]{1,80})$",
         re.IGNORECASE,
     )
+
+    stop_words = {"the", "and", "or", "of", "to", "a", "in"}
 
     for para in document.paragraphs:
         text = para.text.strip()
@@ -62,12 +62,16 @@ def extract_lookup_data(doc_path: Path):
 
         abbr_match = abbr_pattern.match(text)
         if abbr_match:
+            runyoro_term = abbr_match.group(1).strip()
             english = abbr_match.group(2).strip()
-            if len(english.split()) <= 5:
+            if (
+                len(english.split()) <= 5
+                and _valid_term(runyoro_term, stop_words)
+            ):
                 structured_data.append(
                     {
                         "type": "lookup",
-                        "runyoro_term": abbr_match.group(1).strip(),
+                        "runyoro_term": runyoro_term,
                         "english_term": english,
                         "category": "Abbreviations",
                     }
@@ -76,18 +80,34 @@ def extract_lookup_data(doc_path: Path):
 
         dict_match = dict_pattern.match(text)
         if dict_match:
+            runyoro_term = dict_match.group(1).strip()
             english = dict_match.group(2).strip()
-            if len(english.split()) <= 10:
+            if (
+                len(english.split()) <= 10
+                and _valid_term(runyoro_term, stop_words)
+            ):
                 structured_data.append(
                     {
                         "type": "lookup",
-                        "runyoro_term": dict_match.group(1).strip(),
+                        "runyoro_term": runyoro_term,
                         "english_term": english,
                         "category": "Dictionary",
                     }
                 )
 
     return structured_data
+
+
+def _valid_term(term: str, stop_words: set) -> bool:
+    """Return ``True`` if *term* looks like a legitimate Runyoro word."""
+
+    if len(term) <= 1:
+        return False
+    if any(char.isdigit() for char in term):
+        return False
+    if term.lower() in stop_words:
+        return False
+    return True
 
 
 if __name__ == "__main__":
