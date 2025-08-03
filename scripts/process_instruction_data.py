@@ -1,21 +1,44 @@
-import re
+"""Extract grammar instruction data from an OCR'd document.
+
+This script searches a grammar document for noun class rules and outputs
+them in a JSONL format suitable for instruction style fine‑tuning.  The
+original OCR text contains many irregularities (extra whitespace, line
+breaks, and punctuation) which previously caused the regular expressions
+to fail.  The patterns below are intentionally tolerant so that such
+noise does not prevent rule extraction.
+"""
+
 import json
-from docx import Document
+import re
 from pathlib import Path
 
-# --- Configuration ---
-# Update this path to the correct location of your grammar document
-DOC_PATH = Path('data') / 'raw' /  'grammar' / 'RUNYAKITARA LANGUAGE STUDIES.docx'
-# Set the output directory
-OUTPUT_DIR = Path('data') / 'processed'
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-OUTPUT_FILE = OUTPUT_DIR / 'instruction_data.jsonl'
-# ---------------------
+from docx import Document
 
-def extract_instruction_data(doc_path):
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+# Location of the grammar document containing the noun class rules
+DOC_PATH = Path("data") / "raw" / "grammar" / "RUNYAKITARA LANGUAGE STUDIES.docx"
+
+# Output directory for the generated JSONL file
+OUTPUT_DIR = Path("data") / "processed"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE = OUTPUT_DIR / "instruction_data.jsonl"
+
+
+def extract_instruction_data(doc_path: Path):
+    """Extract grammar rules and examples from a DOCX file.
+
+    The regex captures three groups:
+        1. The rule heading (e.g. ``Noun Class 1``)
+        2. The English explanation paragraph(s)
+        3. The block of examples which may span multiple lines
+
+    Each example is further parsed to separate the Runyoro/Rutooro word
+    from its English translation.  Parentheses, dashes and inconsistent
+    spacing are all tolerated.
     """
-    Extracts instruction-style data from the specified DOCX file.
-    """
+
     if not doc_path.exists():
         print(f"Error: Document not found at {doc_path}")
         return []
@@ -23,32 +46,57 @@ def extract_instruction_data(doc_path):
     document = Document(doc_path)
     structured_data = []
 
-    full_text = "\n".join([para.text for para in document.paragraphs])
+    # Join all paragraphs with newlines so that rules spanning multiple
+    # lines can be matched using a single regex on the entire text.
+    full_text = "\n".join(paragraph.text for paragraph in document.paragraphs)
 
-    # Pattern for Noun Class Rules: Looks for a rule explanation followed by examples.
     noun_class_pattern = re.compile(
-        r"(Noun Class \d+[\s\S]*?Examples? are:[\s\n]*)([\s\S]*?)(?=\n\n|\Z)",
-        re.IGNORECASE
+        r"(Noun\s*Class\s*\d+.*?)\n+"  # heading line
+        r"([\s\S]*?)"                    # explanation paragraph(s)
+        r"Examples?\s*[:\-]\s*"         # the word 'Examples' with : or -
+        r"([\s\S]*?)"                    # example lines
+        r"(?=\n\s*Noun\s*Class\s*\d+|\Z)",  # until next heading or EOF
+        re.IGNORECASE,
     )
+
     for match in noun_class_pattern.finditer(full_text):
-        rule_text = match.group(1).strip()
-        examples_text = match.group(2).strip()
-        examples_list = re.findall(r"(\w+)\s+\((.*?)\)", examples_text)
-        
-        completion_text = rule_text.replace(examples_text, "") + " ".join([f"{r} ({e})" for r, e in examples_list])
-        
-        structured_data.append({
-            "type": "instruction",
-            "instruction": f"Explain the rule for {rule_text.splitlines()[0].strip()}",
-            "completion": completion_text.replace("Examples are:", "Examples are:") ,
-            "category": "Noun Classes"
-        })
+        heading = re.sub(r"\s+", " ", match.group(1)).strip()
+        explanation = re.sub(r"\s+", " ", match.group(2)).strip()
+        examples_text = match.group(3).strip()
+
+        # Examples may be separated by commas, semicolons or newlines and
+        # can contain either parentheses or dashes before the translation.
+        examples = []
+        for raw_example in re.split(r"[\n;,]+", examples_text):
+            raw_example = raw_example.strip()
+            if not raw_example:
+                continue
+            ex_match = re.match(
+                r"([A-Za-z'’]+)\s*(?:[-–]\s*)?\(?([^\)\n]+)\)?",
+                raw_example,
+            )
+            if ex_match:
+                runyoro, english = ex_match.groups()
+                examples.append(f"{runyoro} ({english.strip()})")
+
+        completion = f"{explanation} Examples are: {', '.join(examples)}"
+
+        structured_data.append(
+            {
+                "type": "instruction",
+                "instruction": f"Explain the rule for {heading}",
+                "completion": completion,
+                "category": "Noun Classes",
+            }
+        )
 
     return structured_data
 
-# Example usage
-instruction_data = extract_instruction_data(DOC_PATH)
-with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-    for item in instruction_data:
-        f.write(json.dumps(item, ensure_ascii=False) + '\n')
-print(f"Instruction data saved to {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    instruction_data = extract_instruction_data(DOC_PATH)
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        for item in instruction_data:
+            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    print(f"Instruction data saved to {OUTPUT_FILE}")
+

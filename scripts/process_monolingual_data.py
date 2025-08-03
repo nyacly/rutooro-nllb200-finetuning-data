@@ -1,38 +1,63 @@
+"""Extract monolingual paragraphs from OCR'd DOCX files.
+
+Each document in the ``data/raw/monolingual`` directory is scanned and
+paragraphs are reconstructed by combining consecutive non‑empty lines.
+Very short fragments (fewer than five words) are discarded as they are
+usually headers or OCR artefacts.
+"""
+
 import json
-from docx import Document
 from pathlib import Path
 
-# --- Configuration ---
-# Point to your monolingual data folder
-DATA_DIR = Path('data') /  'raw' / 'monolingual'
-# Set the output directory
-OUTPUT_DIR = Path('data') / 'processed'
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-OUTPUT_FILE = OUTPUT_DIR / 'monolingual_data.jsonl'
-# ---------------------
+from docx import Document
 
-def extract_monolingual_data(data_folder):
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+DATA_DIR = Path("data") / "raw" / "monolingual"
+
+OUTPUT_DIR = Path("data") / "processed"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE = OUTPUT_DIR / "monolingual_data.jsonl"
+
+
+def extract_monolingual_data(data_folder: Path):
+    """Extract coherent paragraphs from DOCX files in *data_folder*.
+
+    Consecutive non-empty lines are joined to form a full paragraph.  A
+    small filtering step removes paragraphs with fewer than five words to
+    avoid including titles or noisy OCR fragments.
     """
-    Extracts continuous text from all DOCX files in a specified folder.
-    """
+
     all_data = []
-    
-    for doc_path in data_folder.glob('*.docx'):
-        print(f"Processing {doc_path}...")
+
+    for doc_path in data_folder.glob("*.docx"):
         document = Document(doc_path)
-        
+        buffer = []
+
         for para in document.paragraphs:
             text = para.text.strip()
-            if text and len(text.split()) > 5:
-                all_data.append({
-                    "type": "monolingual_text",
-                    "text": text
-                })
+            if text:
+                buffer.append(text)
+            elif buffer:
+                paragraph = " ".join(buffer)
+                if len(paragraph.split()) >= 5:
+                    all_data.append({"type": "monolingual_text", "text": paragraph})
+                buffer = []
+
+        # Flush any remaining buffered lines at the end of the document
+        if buffer:
+            paragraph = " ".join(buffer)
+            if len(paragraph.split()) >= 5:
+                all_data.append({"type": "monolingual_text", "text": paragraph})
+
     return all_data
 
-# Example usage
-monolingual_data = extract_monolingual_data(DATA_DIR)
-with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-    for item in monolingual_data:
-        f.write(json.dumps(item, ensure_ascii=False) + '\n')
-print(f"Monolingual data saved to {OUTPUT_FILE}")
+
+if __name__ == "__main__":
+    monolingual_data = extract_monolingual_data(DATA_DIR)
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        for item in monolingual_data:
+            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    print(f"Monolingual data saved to {OUTPUT_FILE}")
+
