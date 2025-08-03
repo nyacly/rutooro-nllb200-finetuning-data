@@ -1,10 +1,12 @@
 """Extract dictionary style lookup data from an OCR'd document.
 
-The document contains both abbreviations and dictionary entries with a
-large amount of inconsistent spacing and punctuation produced by the OCR
-process.  The regular expressions here are therefore designed to be
-fairly permissive so that minor variations (e.g. ``adj. - Adjective`` or
-``omuntu  n.   person``) are still captured correctly.
+Early iterations of this script produced very noisy results because the
+regular expressions were too greedy and happily captured entire
+paragraphs.  The patterns below have been tightened to only accept short
+abbreviation pairs (``adj. - adjective``) and dictionary entries
+(``omwana n. child``).  Variations in spacing and the presence of colons
+or dashes are tolerated, but any line that continues beyond a brief
+definition is ignored.
 """
 
 import json
@@ -36,14 +38,20 @@ def extract_lookup_data(doc_path: Path):
     document = Document(doc_path)
     structured_data = []
 
-    # Matches abbreviations such as ``adj. - Adjective`` where the dash is
-    # optional and arbitrary whitespace is tolerated.
-    abbr_pattern = re.compile(r"^([A-Za-z]+\.?)\s*[-–]?\s+(.*)$")
+    # Matches abbreviations such as ``adj. - Adjective`` or ``adv: adverb``.
+    # Only a short English string (up to ~5 words) is accepted in order to
+    # avoid capturing full sentences.
+    abbr_pattern = re.compile(
+        r"^([A-Za-z]+\.?)\s*[:\-–]?\s*([A-Za-z][A-Za-z\s'/-]{0,40})$",
+        re.IGNORECASE,
+    )
 
-    # Matches dictionary entries like ``omuntu n. person`` or ``genda v.-to go``.
-    # The part of speech can vary (n., v., adj., adv., etc.).
+    # Matches dictionary entries like ``omuntu n. person`` or ``genda v.- to go``.
+    # The part of speech is recognised but not stored.  The English
+    # definition is limited to the first clause (terminated by punctuation)
+    # and must be reasonably short to reduce noise.
     dict_pattern = re.compile(
-        r"^([A-Za-z'’]+)\s+(?:n\.|v\.|adj\.|adv\.|pron\.|prep\.|conj\.|interj\.)\s*[-–]?\s*(.+)$",
+        r"^([A-Za-z'’]+)\s+(?:n\.|v\.|adj\.|adv\.|pron\.|prep\.|conj\.|interj\.)\s*[:\-–]?\s*([^.;,]{1,80})$",
         re.IGNORECASE,
     )
 
@@ -54,26 +62,30 @@ def extract_lookup_data(doc_path: Path):
 
         abbr_match = abbr_pattern.match(text)
         if abbr_match:
-            structured_data.append(
-                {
-                    "type": "lookup",
-                    "runyoro_term": abbr_match.group(1).strip(),
-                    "english_term": abbr_match.group(2).strip(),
-                    "category": "Abbreviations",
-                }
-            )
+            english = abbr_match.group(2).strip()
+            if len(english.split()) <= 5:
+                structured_data.append(
+                    {
+                        "type": "lookup",
+                        "runyoro_term": abbr_match.group(1).strip(),
+                        "english_term": english,
+                        "category": "Abbreviations",
+                    }
+                )
             continue
 
         dict_match = dict_pattern.match(text)
         if dict_match:
-            structured_data.append(
-                {
-                    "type": "lookup",
-                    "runyoro_term": dict_match.group(1).strip(),
-                    "english_term": dict_match.group(2).strip(),
-                    "category": "Dictionary",
-                }
-            )
+            english = dict_match.group(2).strip()
+            if len(english.split()) <= 10:
+                structured_data.append(
+                    {
+                        "type": "lookup",
+                        "runyoro_term": dict_match.group(1).strip(),
+                        "english_term": english,
+                        "category": "Dictionary",
+                    }
+                )
 
     return structured_data
 
