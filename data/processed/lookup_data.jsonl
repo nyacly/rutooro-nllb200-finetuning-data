@@ -1,21 +1,103 @@
-{"type": "lookup", "runyoro_term": "Ni", "english_term": "a-ki-shom-a", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Non", "english_term": "Verbs", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Morpho", "english_term": "phonological Rule", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "tu", "english_term": "or", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "bu", "english_term": "The prefix", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ku", "english_term": "to", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ki", "english_term": "bi or", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ku", "english_term": "has been transformed into class", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ki", "english_term": "bi or", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ni", "english_term": "present progressive", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "zin", "english_term": "verb 'dance'", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ka", "english_term": "far past", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Runyoro", "english_term": "Rutooro", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Runyankore", "english_term": "Rukiga", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ni", "english_term": "and Runyoro speakers", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Runyankore", "english_term": "Rukiga", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Runyankore", "english_term": "Rukiga", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Re", "english_term": "ordering", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Lining", "english_term": "up or Queuing Strategy", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "Audio", "english_term": "Visual Translation", "category": "Abbreviations"}
-{"type": "lookup", "runyoro_term": "ka", "english_term": "particle", "category": "Abbreviations"}
+{"type": "lookup", "runyoro_term": "/k/", "english_term": "/g/ because by replacing /k/ with /g/ in a given segment, the meaning can change; e. g., kukanya (to increase) and kuganya (to be miserable).", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/t/", "english_term": "/d/, for example: Such examples as obuta and kukanya are said to constitute \"minimal pairs\".", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "n-dora", "english_term": "(I see).", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/p/", "english_term": "h These two sounds, which are far removed from each other from the articulatory point of view, are otherwise quite close in Runyakitara.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "t,d,ts", "english_term": "t,d,ts and s", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ts", "english_term": "ts sound, on the other hand, is not widely used in Runyakitara.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ts", "english_term": "ts sound is replaced either by s", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ky", "english_term": "ky or hy", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "hy", "english_term": "hy.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ts", "english_term": "ts in Rutooro could be heard particularly among the youth in words such as:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "I,f,Y", "english_term": "I,f,Y, and rr", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr These sounds are very frequent in Runyakitara particularly [f].", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[r]", "english_term": "[r] even more frequently.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr, on the other hand, or the rolled r", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[l]", "english_term": "[l], it can be said that this is practically non-existent among Runyankore speakers.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[l]", "english_term": "[l] is used as in RunyoroRutooro although many Bakiga believe they do not have it simply because it is not in the Runyankore-Rukiga orthography.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "a,o,", "english_term": "or u", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "i….i,", "english_term": "like omubiri (body), pronounced [omubifi] or e….e", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "e….e,", "english_term": "like ekikere", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "(Rn/Rt)", "english_term": "(Rn/Rt) (frog), pronounced [ekikefe] and many other possible environments.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr - also called a trill - is concerned, as mentioned earlier, it is most widely used among the Rutooro speakers but can also be found in other cases.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr is clearly distinctive as can be attested by the following examples:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr in Rutooro is translated.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[r]", "english_term": "[r] is heard in Runyoro and Rutooro but in different conditions.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[r]", "english_term": "[r], like in omunyoro [omunoro] rather than [omunofo]; that is, as [r]", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[r]", "english_term": "[r].", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr such that instead of [omuurro] (fire), one sometimes hears [omuиr].", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "fvfv", "english_term": "fvfv structure is concerned, the rolled r", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "{f∼f∨fv}", "english_term": "{f∼f∨fv} but has undergone change to {fvfv}", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "{fvfv}", "english_term": "{fvfv}.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "l,f,rr", "english_term": "l,f,rr and r", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "rr", "english_term": "rr, only the first r", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "hy", "english_term": "hy in Runyoro-Rutooro is more complex than is shown in the chart above.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "hy", "english_term": "hy, which is close to a velar fricative +y", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "+y", "english_term": "+y, something like: omuXyo (the sound often heard among some Basoga speakers, in Lumasaba or in Luluya).", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "zh", "english_term": "zh ' would have better represented the sound 3 in Runyankore-Rukiga orthography than the present j", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[j]", "english_term": "[j].", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "c,j,ky", "english_term": "c,j,ky and gy", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "gy", "english_term": "gy The palatal sounds c", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ky", "english_term": "ky ' or ' gy", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "gy", "english_term": "gy ' to show palatalisation.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "k+i", "english_term": "k+i or g+i", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "g+i", "english_term": "g+i, however, the letter ' y", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ky", "english_term": "ky and gy", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "gy", "english_term": "gy are usually not heard.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[kv]", "english_term": "[k v ] and [gv]", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "[g", "english_term": "v ], that is, k", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ky", "english_term": "ky and gy", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "gy", "english_term": "gy can also be applied to the pronunciation of ki", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ki", "english_term": "ki and gi", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "gi", "english_term": "gi, which are pronounced as full palatals by Rukiga speakers and many Runyankore speakers but as palatalised velars by a few Runyankore speakers.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ei,oi", "english_term": "ei,oi and ai", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ai", "english_term": "ai for Ry/Rk", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "Ry/Rk", "english_term": "Ry/Rk, and oi", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "oi", "english_term": "oi and ai for", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ai", "english_term": "ai for Rn/Rt", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "Rn/Rt", "english_term": "Rn/Rt.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ei", "english_term": "ei is often used as a class prefix, where, in Rutooro, the prefix i", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ai‾", "english_term": "ai ​ is often pronounced as ei‾", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ei", "english_term": "​ :", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ei", "english_term": "ei seems to be restricted to the presence of the reflexible −e", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "−e", "english_term": "−e - in the verb:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "oi", "english_term": "oi is frequent, particularly in Runyoro-Rutooro:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "p,b,β,m", "english_term": "p,b,β,m and w.b", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "w.b", "english_term": "w.b and β", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "β/b", "english_term": "β/b can be considered as distinct phonemes because there exists at least one minimal pair:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "p/b/p/", "english_term": "p/b/p/ and /b/(orβ)", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/b/(orβ)", "english_term": "/b/(orβ) are usually distinct phonemes as shown below:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/m/", "english_term": "/m/ is also a distinct phoneme as in: (ku)", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "βamba", "english_term": "βamba to crucify (e) mamba type of fish (eki)", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "βuga", "english_term": "βuga town (eki) muga disabled person", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/w/", "english_term": "/w/ This sound has a problem as far as its phonemic status is concerned.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/f/", "english_term": "/f/ and /v/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/v/", "english_term": "/v/ are phonemes of the language.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "(Rn/Rt)", "english_term": "(Rn/Rt) wine ediini religion", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "t,d,ts,n,l,f,rr,Y,s,z,∫", "english_term": "t,d,ts,n,l,f,rr,Y,s,z,∫ and 3 .", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/t/", "english_term": "/t/ and /d/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/d/", "english_term": "/d/ are distinct phonemes.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ts", "english_term": "ts is not a distinct phoneme since it occurs in free variation with s", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/s/", "english_term": "/s/ can be a distinct phoneme as attested in the following examples:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/n/", "english_term": "is also a distinct phoneme:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/r/", "english_term": "/r/ as the basic phoneme (with the variant l", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/rr/", "english_term": "/rr/, it can be considered as a distinct phoneme.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/rr/", "english_term": "/rr/ include (particularly in Rutooro):", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/s/", "english_term": "and /z/ are also distinct phonemes.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "ts", "english_term": "ts is a free variant of s", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/f/", "english_term": "/f/ is a distinct phoneme in RunyankoreRukiga.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/3/", "english_term": "/3/ is also a distinct phoneme in Runyankore-Rukiga.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "c,j,ny,y,k,g,ky", "english_term": "c,j,ny,y,k,g,k y", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "h./c/", "english_term": "h./c/ and /j/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/j/", "english_term": "/j/ are distinct phonemes in both Runyoro-Rutooro and Runyankore-Rukiga, but as we have already seen, they can also be conditional variants of k", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/c/", "english_term": "/c/ and /j/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/j/", "english_term": "/j/ and n", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/n/", "english_term": "/n/ and /y/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/y/", "english_term": "/y/ are also phonemes in Runyakitara as in:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/k/", "english_term": "/k/ and /g/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/g/", "english_term": "/g/ are distinct phonemes in Runyakitara but, as we have already seen, among some Runyankore speakers, the conditional variants ky", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/k/", "english_term": "/k/ and /g/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/g/", "english_term": "/g/ as distinct phonemes can be seen in the following minimal pairs:", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/h/", "english_term": "/h/ is also a distinct phoneme.", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/rr/", "english_term": "/rr/, which Runyankore-Rukiga does not have, the latter has two phonemes, /J/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/J/", "english_term": "/J/ and /3/", "category": "Dictionary"}
+{"type": "lookup", "runyoro_term": "/3/", "english_term": "/3/, which Runyoro-Rutooro does not have.", "category": "Dictionary"}

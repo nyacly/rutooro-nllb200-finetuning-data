@@ -26,7 +26,6 @@ def extract_monolingual_data(data_folder: Path):
     """Extract coherent paragraphs from DOCX files in *data_folder*."""
 
     all_data = []
-
     for doc_path in data_folder.glob("*.docx"):
         document = Document(doc_path)
         buffer = []
@@ -34,22 +33,31 @@ def extract_monolingual_data(data_folder: Path):
         for para in document.paragraphs:
             text = para.text.strip()
 
-            if not text or _looks_like_list_line(text):
+            if not text:
                 if buffer:
-                    paragraph = " ".join(buffer)
-                    if _is_valid_paragraph(paragraph):
-                        all_data.append({"type": "monolingual_text", "text": paragraph})
+                    _process_buffer(buffer, all_data)
+                    buffer = []
+                continue
+
+            if _looks_like_list_line(text):
+                if buffer:
+                    _process_buffer(buffer, all_data)
                     buffer = []
                 continue
 
             buffer.append(text)
 
         if buffer:
-            paragraph = " ".join(buffer)
-            if _is_valid_paragraph(paragraph):
-                all_data.append({"type": "monolingual_text", "text": paragraph})
+            _process_buffer(buffer, all_data)
 
     return all_data
+
+
+def _process_buffer(buffer, all_data):
+    """Process the buffer to extract paragraphs."""
+    paragraph = " ".join(buffer)
+    if _is_valid_paragraph(paragraph):
+        all_data.append({"type": "monolingual_text", "text": paragraph})
 
 
 def _is_valid_paragraph(paragraph: str) -> bool:
