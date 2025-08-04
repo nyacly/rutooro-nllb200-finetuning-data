@@ -102,22 +102,38 @@ def extract_instruction_data(paragraphs, used_paras):
     return instruction_data
 
 
-def extract_monolingual_data(paragraphs, used_paras):
+def extract_monolingual_data(paragraphs=None, used_paras=None, folder_path=None):
     """
-    Extracts coherent paragraphs of text from the remaining document content.
+    Extracts coherent paragraphs of text.
+
+    Can operate in two modes:
+    1. From a list of paragraphs from a document, skipping used ones.
+    2. From a folder of .docx files.
     """
     monolingual_data = []
-    for i, para in enumerate(paragraphs):
-        if i in used_paras:
-            continue
 
-        text = para.text.strip()
+    if paragraphs and used_paras is not None:
+        # Mode 1: Process paragraphs from a single document
+        for i, para in enumerate(paragraphs):
+            if i in used_paras:
+                continue
+            text = para.text.strip()
+            if len(text.split()) >= 20:
+                monolingual_data.append({"type": "monolingual_text", "text": text})
+        print(f"Extracted {len(monolingual_data)} monolingual entries from main document.")
 
-        # Filter for paragraphs with at least 20 words
-        if len(text.split()) >= 20:
-            monolingual_data.append({"type": "monolingual_text", "text": text})
+    elif folder_path:
+        # Mode 2: Process all .docx files in a folder
+        initial_count = len(monolingual_data)
+        for doc_path in folder_path.glob("*.docx"):
+            document = Document(doc_path)
+            for para in document.paragraphs:
+                text = para.text.strip()
+                if len(text.split()) >= 20:
+                    monolingual_data.append({"type": "monolingual_text", "text": text})
+        count = len(monolingual_data) - initial_count
+        print(f"Extracted {count} monolingual entries from {folder_path}.")
 
-    print(f"Extracted {len(monolingual_data)} monolingual text entries.")
     return monolingual_data
 
 
@@ -135,9 +151,14 @@ def main():
     # 1. Extract instruction data
     all_data = extract_instruction_data(paragraphs, used_paras)
 
-    # 3. Extract monolingual text
-    monolingual_data = extract_monolingual_data(paragraphs, used_paras)
-    all_data.extend(monolingual_data)
+    # 2. Extract monolingual text from main document
+    monolingual_from_main = extract_monolingual_data(paragraphs=paragraphs, used_paras=used_paras)
+    all_data.extend(monolingual_from_main)
+
+    # 3. Extract monolingual text from dedicated folder
+    MONOLINGUAL_DIR = Path("data/raw/monolingual")
+    monolingual_from_folder = extract_monolingual_data(folder_path=MONOLINGUAL_DIR)
+    all_data.extend(monolingual_from_folder)
 
     print(f"Writing final dataset to {OUTPUT_FILE}")
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
